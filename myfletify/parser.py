@@ -8,6 +8,7 @@ class HTML:
     """
 
     class Tags:
+        VIEDEO = "video"
         IMG = "img"
         UL = "ul"
         OL = "ol"
