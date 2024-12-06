@@ -9,9 +9,7 @@ class RenderHTML:
         with open(self.file, encoding=encoding) as file:
             self.html_str = file.read()
 
-    def __repr__():
-        ...
-
+    def __repr__(): ...
     def display(self):
         return self.html_str
 

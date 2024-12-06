@@ -2,9 +2,7 @@ import flet as ft
 from bs4 import NavigableString, BeautifulSoup
 
 
-
 class HTML:
-    # ----------------------------------------------------------------------------------------------
     """
     Supported HTML tags and attributes
     """
@@ -45,7 +43,6 @@ class HTML:
         TYPE = "type"
 
     TEXT_STYLE_DECORATION = ["underline", "line-through", "overline"]
-
     HEADINGS_TEXT_SIZE = {
         Tags.H1: 32,
         Tags.H2: 24,
@@ -54,7 +51,6 @@ class HTML:
         Tags.H5: 13,
         Tags.H6: 10,
     }
-
     ##UPCOMING STYLE ATTRIBUTES
 
 
@@ -77,12 +73,13 @@ class HTML:
 def parse_html_to_flet(element):
     if element.name == HTML.Tags.DIV:
         style, align_style = get_style(element, is_a_mapping=True)
-
         # Map <div> to ft.Column
         main_container = ft.Container(
-            content=ft.Row([], **align_style)
-            if "alignment" in align_style
-            else ft.Column([]),
+            content=(
+                ft.Row([], **align_style)
+                if "alignment" in align_style
+                else ft.Column([])
+            ),
             **style,
         )
         for child in element.children:
@@ -91,12 +88,10 @@ def parse_html_to_flet(element):
                 if child.name == HTML.Tags.TABLE:
                     # Call "html_table_to_flet()" function to display the table
                     html_table_to_flet(element, main_container)
-
                 # Recursively parse child elements
                 child_flet = parse_html_to_flet(child)
                 main_container.content.controls.append(child_flet)
         return main_container
-
     # Heading tags
     elif element.name in HTML.HEADINGS_TEXT_SIZE.keys():
         heading_text = ft.Text(
@@ -108,7 +103,6 @@ def parse_html_to_flet(element):
         style = get_style(element)
         # Map <p> to ft.Text within ft.Row
         paragraph = ft.Row([])
-
         # Support for nested tags inside the <p> tag ##STILL NEED IMPROVEMENTS##
         if element.children:
             for child in element.children:
@@ -116,17 +110,14 @@ def parse_html_to_flet(element):
                     # Parse the nested element
                     p_child = parse_html_to_flet(child)
                     paragraph.controls.append(p_child)
-
                 elif isinstance(child, NavigableString):
                     # Handle text content directly within the <p> tag
                     text_content = child.text
                     text_element = ft.Text(
                         spans=[ft.TextSpan(text_content, style=style[0])]
                     )
-
                     # Add the text_element to the paragraph
                     paragraph.controls.append(text_element)
-
         return paragraph
     # Link tag
     elif element.name == HTML.Tags.A:
@@ -141,22 +132,18 @@ def parse_html_to_flet(element):
             ]
         )
         return link
-
     # Image tag
     elif element.name == HTML.Tags.IMG:
         img_style, _ = get_style(element, is_a_mapping=True)
-
         # Map <img> to ft.Image with a source URL
         image = ft.Container(
             content=ft.Image(src=element.get(HTML.Attrs.SRC)), **img_style
         )
         return image
-
     # HTML lists
     elif element.name == HTML.Tags.UL or element.name == HTML.Tags.OL:
         # Map <ul> and <ol> to ft.Column
         list_container = ft.Column(spacing=0)
-
         for i, li in enumerate(element.find_all(HTML.Tags.LI)):
             _leading = (
                 ft.Text("•", size=20)
@@ -167,22 +154,21 @@ def parse_html_to_flet(element):
 
             list_container.controls.append(list_item)
         return list_container
-
     # Bold Tags
     elif element.name == HTML.Tags.B or element.name == HTML.Tags.STRONG:
         bold_text = ft.Text(
             value=element.text,
-            weight=ft.FontWeight.BOLD
-            if element.name == HTML.Tags.B
-            else ft.FontWeight.W_900,
+            weight=(
+                ft.FontWeight.BOLD
+                if element.name == HTML.Tags.B
+                else ft.FontWeight.W_900
+            ),
         )
         return bold_text
-
     # Italic Tag
     elif element.name == HTML.Tags.I or element.name == HTML.Tags.EM:
         italic_text = ft.Text(element.text, italic=True)
         return italic_text
-
     # Underline Tag
     elif element.name == HTML.Tags.U:
         underlined_text = ft.Text(
@@ -214,12 +200,10 @@ def parse_html_to_flet(element):
             extension_set="gitHubWeb",
             code_theme="atom-one-dark",
         )
-
     # Span Tag
     elif element.name == HTML.Tags.SPAN:
         span_style = get_style(element)
         return ft.Text(spans=[ft.TextSpan(element.text, style=span_style[0])])
-
     else:
         # Default to ft.Container for unrecognized elements
         container = ft.Container()
@@ -228,10 +212,7 @@ def parse_html_to_flet(element):
                 child_flet = parse_html_to_flet(child)
                 container.content = child_flet
         return container
-
-
-# ____________________________________________________________________________________________________________________________________
-# Parser function for html tables
+    # Parser function for html tables
 
 
 def html_table_to_flet(element, container):
@@ -256,9 +237,7 @@ def html_table_to_flet(element, container):
         container.content.controls.append(flet_table)
 
 
-# ___________________________________________________________________________________________________________________________________
 # Associate html inline styles to the corresponding flet style properties
-# ____________________________________________________________________________________________________________________________________
 html_to_flet_style_mapping = {
     "color": "color",
     "background-color": "bgcolor",
@@ -305,7 +284,6 @@ def parse_inline_styles(style_string):
                     "space-around": ft.MainAxisAlignment.SPACE_AROUND,
                     "space-evenly": ft.MainAxisAlignment.SPACE_EVENLY,
                 }
-
                 # Convert property_value to integer if it's a digit otherwise, keep the original value
                 style_properties[property_name] = (
                     int(property_value) if property_value.isdigit() else property_value
@@ -323,7 +301,6 @@ def parse_inline_styles(style_string):
                     property_name == "alignment" and property_value in alignment_values
                 ):
                     style_properties["alignment"] = alignment_values[property_value]
-
     style_properties.pop("display", None)
     return style_properties
 
@@ -335,9 +312,7 @@ def get_style(element, is_a_mapping: bool = False):
         if "alignment" in style_props:
             val = style_props.pop("alignment")
             alignment_props = {"alignment": val}
-
         _style = style_props if is_a_mapping else ft.TextStyle(**style_props)
-
     else:
         _style = {}
     return _style, alignment_props

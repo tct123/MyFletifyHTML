@@ -1,8 +1,8 @@
-from fletify.utils import RenderHTML
-from fletify.converter import convert_html_to_flet
+from myfletify.utils import RenderHTML
+from myfletify.converter import convert_html_to_flet
 
 
-class FletifyHTML:
+class MyFletifyHTML:
     def __init__(self, html):
         self.html = html
         if isinstance(self.html, str):
