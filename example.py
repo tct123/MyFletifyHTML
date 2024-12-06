@@ -8,7 +8,6 @@ flet_code = MyFletifyHTML(html=html_content)
 
 def main(page: ft.Page):
     page.scroll = "always"
-
     page.add(flet_code.get_flet())
     page.update()
 
