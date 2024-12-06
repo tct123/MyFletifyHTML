@@ -1,7 +1,6 @@
 import flet as ft
 from myfletify import MyFletifyHTML
 
-
 html_content = "example.html"
 flet_code = MyFletifyHTML(html=html_content)
 
